@@ -34,6 +34,10 @@ export const ArticleParamsForm = ({
 	};
 
 	useEffect(() => {
+		if (!isOpen) {
+			return;
+		}
+
 		const handleOutsideClick = (event: MouseEvent) => {
 			if (
 				isOpen &&
@@ -55,6 +59,7 @@ export const ArticleParamsForm = ({
 
 		return () => {
 			document.removeEventListener('mousedown', handleOutsideClick);
+			document.removeEventListener('keydown', handleEscClick);
 		};
 	}, [isOpen]);
 
@@ -72,7 +77,6 @@ export const ArticleParamsForm = ({
 	return (
 		<div ref={formRef}>
 			<ArrowButton isOpen={isOpen} onClick={handleArrowClick} />
-
 			<aside
 				className={clsx(styles.container, {
 					[styles.container_open]: isOpen,
@@ -81,6 +85,7 @@ export const ArticleParamsForm = ({
 					className={styles.form}
 					onSubmit={handleSubmit}
 					onReset={handleReset}>
+					<h2 className={styles.container_title}>Задайте параметры</h2>
 					<Select
 						title='Шрифт'
 						selected={formState.fontFamilyOption}
