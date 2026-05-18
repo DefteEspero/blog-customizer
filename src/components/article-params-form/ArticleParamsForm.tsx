@@ -1,9 +1,8 @@
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 import { Select } from 'src/ui/select';
-import { Separator } from 'src/ui/separator';
 import { RadioGroup } from 'src/ui/radio-group';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, FormEvent } from 'react';
 import {
 	backgroundColors,
 	contentWidthArr,
@@ -11,14 +10,24 @@ import {
 	fontColors,
 	fontFamilyOptions,
 	fontSizeOptions,
+	ArticleStateType,
 } from 'src/constants/articleProps';
 import clsx from 'clsx';
 
 import styles from './ArticleParamsForm.module.scss';
 
-export const ArticleParamsForm = () => {
+type ArticleParamsFormProps = {
+	articleState: ArticleStateType;
+	onChangeArticleState: (state: ArticleStateType) => void;
+};
+
+export const ArticleParamsForm = ({
+	articleState,
+	onChangeArticleState,
+}: ArticleParamsFormProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const formRef = useRef<HTMLDivElement>(null);
+	const [formState, setFormState] = useState<ArticleStateType>(articleState);
 
 	const handleArrowClick = () => {
 		setIsOpen((currentIsOpen) => !currentIsOpen);
@@ -49,6 +58,17 @@ export const ArticleParamsForm = () => {
 		};
 	}, [isOpen]);
 
+	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		onChangeArticleState(formState);
+	};
+
+	const handleReset = (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		setFormState(defaultArticleState);
+		onChangeArticleState(defaultArticleState);
+	};
+
 	return (
 		<div ref={formRef}>
 			<ArrowButton isOpen={isOpen} onClick={handleArrowClick} />
@@ -57,43 +77,52 @@ export const ArticleParamsForm = () => {
 				className={clsx(styles.container, {
 					[styles.container_open]: isOpen,
 				})}>
-				<form className={styles.form}>
+				<form
+					className={styles.form}
+					onSubmit={handleSubmit}
+					onReset={handleReset}>
 					<Select
 						title='Шрифт'
-						selected={defaultArticleState.fontFamilyOption}
+						selected={formState.fontFamilyOption}
 						options={fontFamilyOptions}
-						onChange={() => {}}
+						onChange={(fontFamilyOption) =>
+							setFormState({ ...formState, fontFamilyOption })
+						}
 					/>
 
 					<RadioGroup
 						title='Размер шрифта'
 						name='font-size'
-						selected={defaultArticleState.fontSizeOption}
+						selected={formState.fontSizeOption}
 						options={fontSizeOptions}
-						onChange={() => {}}
+						onChange={(fontSizeOption) =>
+							setFormState({ ...formState, fontSizeOption })
+						}
 					/>
 
 					<Select
 						title='Цвет шрифта'
-						selected={defaultArticleState.fontColor}
+						selected={formState.fontColor}
 						options={fontColors}
-						onChange={() => {}}
+						onChange={(fontColor) => setFormState({ ...formState, fontColor })}
 					/>
-
-					<Separator />
 
 					<Select
 						title='Цвет фона'
-						selected={defaultArticleState.backgroundColor}
+						selected={formState.backgroundColor}
 						options={backgroundColors}
-						onChange={() => {}}
+						onChange={(backgroundColor) =>
+							setFormState({ ...formState, backgroundColor })
+						}
 					/>
 
 					<Select
 						title='Ширина контента'
-						selected={defaultArticleState.contentWidth}
+						selected={formState.contentWidth}
 						options={contentWidthArr}
-						onChange={() => {}}
+						onChange={(contentWidth) =>
+							setFormState({ ...formState, contentWidth })
+						}
 					/>
 
 					<div className={styles.bottomContainer}>
